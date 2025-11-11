@@ -2,9 +2,7 @@ package me.josh.tictactoe;
 
 import me.josh.tictactoe.controller.GameController;
 import me.josh.tictactoe.model.*;
-import me.josh.tictactoe.model.player.ComputerPlayer;
-import me.josh.tictactoe.model.player.HumanPlayer;
-import me.josh.tictactoe.model.player.Player;
+import me.josh.tictactoe.model.player.*;
 import me.josh.tictactoe.view.GameView;
 
 import javax.swing.*;
@@ -19,8 +17,8 @@ public final class Main {
         // Run on the Event Dispatch Thread for thread safety
         SwingUtilities.invokeLater(() -> {
             // Create players
-            Player human = new HumanPlayer(Symbol.X, "Player");
-            Player computer = new ComputerPlayer(Symbol.O);
+            Player human = PlayerFactory.createPlayer(PlayerType.HUMAN, Symbol.X, "Player");
+            Player computer = PlayerFactory.createPlayer(PlayerType.COMPUTER, Symbol.O, null);
 
             // Create model
             TicTacToeGame game = new TicTacToeGame(human, computer);
