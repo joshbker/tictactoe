@@ -4,6 +4,9 @@ import me.josh.tictactoe.model.player.ComputerPlayer;
 import me.josh.tictactoe.model.player.HumanPlayer;
 import me.josh.tictactoe.model.player.Player;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Core game logic for Tic Tac Toe.
  * Manages the board state, players, turn tracking, and win/draw detection.
@@ -29,6 +32,18 @@ public class TicTacToeGame {
     public Player winner = null;
 
     /**
+     * List of observers to notify of game events.<br>
+     * Observers can be registered by adding to this list (e.g., observers.add(observer))<br>
+     * and unregistered by removing from it (e.g., observers.remove(observer)).<br>
+     * Observers will be notified when:<br>
+     * - A move is made (onMoveMade)<br>
+     * - The game ends (onGameOver)<br>
+     * - A turn changes (onTurnChanged)<br>
+     * - The game is reset (onGameReset)
+     */
+    public final List<GameObserver> observers = new ArrayList<>();
+
+    /**
      * Creates a new Tic Tac Toe game with the given players.
      * Player 1 goes first.
      *
@@ -46,6 +61,50 @@ public class TicTacToeGame {
             for (int col = 0; col < 3; col++) {
                 board[row][col] = Symbol.EMPTY;
             }
+        }
+    }
+
+    /**
+     * Notifies all observers that a move was made.
+     *
+     * @param row The row where the move was made
+     * @param col The column where the move was made
+     * @param symbol The symbol that was placed
+     */
+    private void notifyMoveMade(int row, int col, Symbol symbol) {
+        for (GameObserver observer : observers) {
+            observer.onMoveMade(row, col, symbol);
+        }
+    }
+
+    /**
+     * Notifies all observers that the game has ended.
+     *
+     * @param winner The winning player, or null if draw
+     */
+    private void notifyGameOver(Player winner) {
+        for (GameObserver observer : observers) {
+            observer.onGameOver(winner);
+        }
+    }
+
+    /**
+     * Notifies all observers that the turn has changed.
+     *
+     * @param currentPlayer The player whose turn it now is
+     */
+    private void notifyTurnChanged(Player currentPlayer) {
+        for (GameObserver observer : observers) {
+            observer.onTurnChanged(currentPlayer);
+        }
+    }
+
+    /**
+     * Notifies all observers that the game has been reset.
+     */
+    private void notifyGameReset() {
+        for (GameObserver observer : observers) {
+            observer.onGameReset();
         }
     }
 
@@ -70,16 +129,21 @@ public class TicTacToeGame {
         // Make the move
         board[row][col] = currentPlayer.symbol;
 
+        // Notify observers of the move
+        notifyMoveMade(row, col, currentPlayer.symbol);
+
         // Check for win
         if (checkWin()) {
             gameOver = true;
             winner = currentPlayer;
+            notifyGameOver(winner);
             return true;
         }
 
         // Check for draw
         if (isBoardFull()) {
             gameOver = true;
+            notifyGameOver(null); // null indicates draw
             return true;
         }
 
@@ -160,6 +224,7 @@ public class TicTacToeGame {
      */
     private void switchPlayer() {
         currentPlayer = (currentPlayer == player1) ? player2 : player1;
+        notifyTurnChanged(currentPlayer);
     }
 
     /**
@@ -177,6 +242,9 @@ public class TicTacToeGame {
         currentPlayer = player1;
         gameOver = false;
         winner = null;
+
+        // Notify observers of reset
+        notifyGameReset();
     }
 
     /**

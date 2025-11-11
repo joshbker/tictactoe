@@ -10,8 +10,9 @@ import javax.swing.*;
 /**
  * Controller that mediates between the game model and view.
  * Handles user input, updates the model, and refreshes the view.
+ * Implements GameObserver to receive notifications of game events.
  */
-public class GameController {
+public class GameController implements GameObserver {
 
     private final TicTacToeGame game;
     private final GameView view;
@@ -26,8 +27,12 @@ public class GameController {
         this.game = game;
         this.view = view;
 
+        // Register as observer
+        game.observers.add(this);
+
         initializeListeners();
-        updateView();
+        // Set initial status
+        updateStatusMessage();
     }
 
     /**
@@ -62,16 +67,14 @@ public class GameController {
         }
 
         // Attempt to make the move
-        if (game.makeMove(row, col)) {
-            updateView();
+        game.makeMove(row, col);
 
-            // If game isn't over, and it's computer's turn, make computer move
-            if (!game.gameOver && game.isCurrentPlayerComputer()) {
-                // Small delay so user can see their move before computer responds
-                Timer timer = new Timer(500, e -> makeComputerMove());
-                timer.setRepeats(false);
-                timer.start();
-            }
+        // If game isn't over, and it's computer's turn, make computer move
+        if (!game.gameOver && game.isCurrentPlayerComputer()) {
+            // Small delay so user can see their move before computer responds
+            Timer timer = new Timer(500, e -> makeComputerMove());
+            timer.setRepeats(false);
+            timer.start();
         }
     }
 
@@ -84,7 +87,6 @@ public class GameController {
 
         if (move != null) {
             game.makeMove(move[0], move[1]);
-            updateView();
         }
     }
 
@@ -108,37 +110,46 @@ public class GameController {
      */
     private void handleNewGame() {
         game.reset();
-        view.boardPanel.reset();
-        updateView();
     }
 
     /**
-     * Updates the view to reflect the current game state.
+     * Updates the status message based on current game state.
      */
-    private void updateView() {
-        // Update all cells
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-                Symbol symbol = game.getSymbolAt(row, col);
-                if (symbol != Symbol.EMPTY) {
-                    view.boardPanel.updateCell(row, col, symbol);
-                }
-            }
-        }
-
-        // Update status message
+    private void updateStatusMessage() {
         if (game.gameOver) {
             if (game.winner != null) {
                 view.statusPanel.setStatus(game.winner.name + " wins!");
-                view.boardPanel.disableAll();
             } else if (game.isDraw()) {
                 view.statusPanel.setStatus("It's a draw!");
-                view.boardPanel.disableAll();
             }
         } else {
             Player current = game.getCurrentPlayer();
             view.statusPanel.setStatus(current.name + "'s turn (" + current.symbol + ")");
         }
+    }
+
+    @Override
+    public void onMoveMade(int row, int col, Symbol symbol) {
+        // Update the cell in the view
+        view.boardPanel.updateCell(row, col, symbol);
+    }
+
+    @Override
+    public void onGameOver(Player winner) {
+        // Disable all buttons
+        view.boardPanel.disableAll();
+        updateStatusMessage();
+    }
+
+    @Override
+    public void onTurnChanged(Player currentPlayer) {
+        updateStatusMessage();
+    }
+
+    @Override
+    public void onGameReset() {
+        view.boardPanel.reset();
+        updateStatusMessage();
     }
 
 }
