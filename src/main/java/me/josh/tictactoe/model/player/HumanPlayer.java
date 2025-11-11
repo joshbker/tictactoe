@@ -1,4 +1,6 @@
-package me.josh.tictactoe.model;
+package me.josh.tictactoe.model.player;
+
+import me.josh.tictactoe.model.Symbol;
 
 /**
  * Represents a human player who makes moves through the GUI.

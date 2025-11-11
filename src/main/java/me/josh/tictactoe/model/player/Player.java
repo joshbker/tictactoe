@@ -1,4 +1,6 @@
-package me.josh.tictactoe.model;
+package me.josh.tictactoe.model.player;
+
+import me.josh.tictactoe.model.Symbol;
 
 /**
  * Abstract class representing a player in Tic Tac Toe.

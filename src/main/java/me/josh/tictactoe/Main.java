@@ -2,6 +2,9 @@ package me.josh.tictactoe;
 
 import me.josh.tictactoe.controller.GameController;
 import me.josh.tictactoe.model.*;
+import me.josh.tictactoe.model.player.ComputerPlayer;
+import me.josh.tictactoe.model.player.HumanPlayer;
+import me.josh.tictactoe.model.player.Player;
 import me.josh.tictactoe.view.GameView;
 
 import javax.swing.*;

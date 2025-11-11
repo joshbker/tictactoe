@@ -1,6 +1,8 @@
 package me.josh.tictactoe.controller;
 
 import me.josh.tictactoe.model.*;
+import me.josh.tictactoe.model.player.ComputerPlayer;
+import me.josh.tictactoe.model.player.Player;
 import me.josh.tictactoe.view.GameView;
 
 import javax.swing.*;

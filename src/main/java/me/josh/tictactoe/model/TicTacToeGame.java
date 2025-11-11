@@ -1,5 +1,9 @@
 package me.josh.tictactoe.model;
 
+import me.josh.tictactoe.model.player.ComputerPlayer;
+import me.josh.tictactoe.model.player.HumanPlayer;
+import me.josh.tictactoe.model.player.Player;
+
 /**
  * Core game logic for Tic Tac Toe.
  * Manages the board state, players, turn tracking, and win/draw detection.
